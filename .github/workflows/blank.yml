@@ -1,0 +1,25 @@
+name: Update FX Rates in Notion
+
+on:
+  schedule:
+    # Her gün 06:00 UTC = TSİ (UTC+3) 09:00 civarı.
+    # ECB kurları saat ~16:00 CET'te güncellenir; istersen saati geriye
+    # (örn. '0 15 * * *' -> TSİ ~18:00) çekip günün son kurunu alabilirsin.
+    - cron: "0 6 * * *"
+  workflow_dispatch: {} # Actions sekmesinden manuel de tetiklenebilir
+
+jobs:
+  update-rates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Kurları çek ve Notion'ı güncelle
+        run: node update-fx-rates.js
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_PAGE_ID: ${{ secrets.NOTION_PAGE_ID }}
